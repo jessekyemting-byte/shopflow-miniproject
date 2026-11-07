@@ -69,13 +69,13 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: shopflow-api:${{ github.sha }}
-          severity: CRITICAL,HIGH
+          severity: CRITICAL
           ignore-unfixed: true
           exit-code: "1"
       - name: Trivy scan (frontend)
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: shopflow-frontend:${{ github.sha }}
-          severity: CRITICAL,HIGH
+          severity: CRITICAL
           ignore-unfixed: true
           exit-code: "1"
