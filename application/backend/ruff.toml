@@ -1,4 +1,5 @@
 line-length = 120
 
 [lint]
-ignore = ["E701", "E702"]   # the provided source uses one-line statements; documented decision
+select = ["E4", "E7", "E9", "F"]
+ignore = ["E701", "E702"]   # provided source uses one-line statements; documented decision
