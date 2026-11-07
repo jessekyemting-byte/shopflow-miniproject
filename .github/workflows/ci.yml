@@ -66,14 +66,14 @@ jobs:
           docker build -t shopflow-api:${{ github.sha }} application/backend
           docker build -t shopflow-frontend:${{ github.sha }} application/frontend
       - name: Trivy scan (backend)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@master
         with:
           image-ref: shopflow-api:${{ github.sha }}
           severity: CRITICAL,HIGH
           ignore-unfixed: true
           exit-code: "1"
       - name: Trivy scan (frontend)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@master
         with:
           image-ref: shopflow-frontend:${{ github.sha }}
           severity: CRITICAL,HIGH
