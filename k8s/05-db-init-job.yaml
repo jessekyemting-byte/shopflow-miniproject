@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-init
+  namespace: shopflow
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: db-init
+        image: shopflow-api:latest
+        imagePullPolicy: Never
+        command: ["sh", "-c", "flask --app app init-db && flask --app app seed"]
+        envFrom:
+        - configMapRef:
+            name: shopflow-config
+        - secretRef:
+            name: shopflow-secrets

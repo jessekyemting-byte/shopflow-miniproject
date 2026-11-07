@@ -1,0 +1,43 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: shopflow-alerts
+  namespace: shopflow
+spec:
+  groups:
+  - name: shopflow.rules
+    rules:
+    # Alert 1: Backend Down
+    - alert: BackendDown
+      expr: absent(up{job="backend"}) or up{job="backend"} == 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Backend service is completely down"
+        
+    # Alert 2: High Error Rate (HTTP 5xx)
+    - alert: HighErrorRate
+      expr: sum(rate(flask_http_request_total{status=~"5.."}[5m])) / sum(rate(flask_http_request_total[5m])) > 0.05
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "More than 5% of requests are returning 5xx errors"
+        
+    # Alert 3: High p95 Latency (>500ms)
+    - alert: HighLatency
+      expr: histogram_quantile(0.95, sum(rate(flask_http_request_duration_seconds_bucket[5m])) by (le)) > 0.5
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "p95 latency is exceeding 500ms"
+        
+    # Alert 4: Pod Restarts
+    - alert: PodRestarts
+      expr: changes(kube_pod_container_status_restarts_total{namespace="shopflow"}[15m]) > 2
+      labels:
+        severity: warning
+      annotations:
+        summary: "Pods are crashing/restarting frequently"
