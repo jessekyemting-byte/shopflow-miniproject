@@ -8,6 +8,6 @@ spec:
     matchLabels:
       app: backend
   endpoints:
-  - port: metrics
+  - port: http
     path: /metrics
     interval: 15s

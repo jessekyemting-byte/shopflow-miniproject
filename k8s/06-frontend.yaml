@@ -3,10 +3,14 @@ kind: Service
 metadata:
   name: frontend-svc
   namespace: shopflow
+  labels:
+    app: frontend
 spec:
   type: NodePort
   ports:
-  - port: 8080
+  - name: http
+    port: 8080
+    targetPort: 8080
     nodePort: 30080
   selector:
     app: frontend
@@ -16,8 +20,10 @@ kind: Deployment
 metadata:
   name: frontend
   namespace: shopflow
+  labels:
+    app: frontend
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: frontend
@@ -26,9 +32,35 @@ spec:
       labels:
         app: frontend
     spec:
+      securityContext:
+        runAsUser: 101
+        runAsNonRoot: true
       containers:
       - name: frontend
-        image: shopflow-frontend:latest
-        imagePullPolicy: Never
+        image: shopflow-frontend:1.0.0
+        imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 8080
+        - name: http
+          containerPort: 8080
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          requests:
+            cpu: 50m
+            memory: 32Mi
+          limits:
+            cpu: 200m
+            memory: 64Mi
